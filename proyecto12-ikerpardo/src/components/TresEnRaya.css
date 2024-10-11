@@ -1,0 +1,101 @@
+h1 {
+  text-align: center;
+  font-size: 2rem;
+}
+
+.tablero {
+  display: grid;
+  grid-template-columns: repeat(3, 80px);
+  grid-gap: 10px;
+  margin-bottom: 20px;
+}
+
+.casilla {
+  width: 80px;
+  height: 80px;
+  font-size: 3rem;
+  cursor: pointer;
+  background-color: white;
+  border: 2px solid #2ab96b;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, transform 0.14s ease;
+}
+
+.casilla:active {
+  background-color: #09f793;
+  color: white;
+  transform: scale(0.95);
+}
+
+.estado {
+  text-align: center;
+  font-size: 1.6rem;
+  margin: 20px 0;
+  color: black;
+}
+
+.contenedor-reiniciar button {
+  padding: 10px 20px;
+  font-size: 1.3rem;
+  cursor: pointer;
+  background-color: #2ab96b;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease;
+}
+
+.contenedor-reiniciar button:hover {
+  background-color: #09f793;
+}
+
+.contenedor-reiniciar {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+@media (max-width: 600px) {
+  .tablero {
+    grid-template-columns: repeat(3, 60px);
+  }
+
+  .casilla {
+    width: 60px;
+    height: 60px;
+    font-size: 2.5rem;
+  }
+
+  .estado {
+    font-size: 1.8rem;
+  }
+
+  .contenedor-reiniciar button {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .tablero {
+    grid-template-columns: repeat(3, 50px);
+  }
+
+  .casilla {
+    width: 50px;
+    height: 50px;
+    font-size: 2rem;
+  }
+
+  .estado {
+    font-size: 1.5rem;
+  }
+
+  .contenedor-reiniciar button {
+    font-size: 1rem;
+  }
+}
