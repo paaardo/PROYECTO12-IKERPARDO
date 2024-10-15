@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useCallback } from 'react';
+import React, { useEffect, useMemo, useCallback, useRef } from 'react';
 import useJuego from '../hooks/useJuego';
 import './Bingo.css';
 
@@ -16,25 +16,27 @@ const Bingo = () => {
     reanudarJuego,
     reiniciarJuego,
     generarCarton,
-    setNumerosLlamados,
-    setNumeroActual,
-    setJuegoTerminado,
-    setMostrarBingo,
+    agregarNumero,
+    actualizarNumeroActual,
+    terminarJuego,
     juegoActivo,
   } = useJuego('bingo');
 
   const [numeros, setNumeros] = React.useState(Array.from({ length: 99 }, (_, i) => i + 1));
-
+  const montado = useRef(false);
   useEffect(() => {
-    generarCarton();
+    if (!montado.current) {
+      generarCarton();
+      montado.current = true;
+    }
   }, [generarCarton]);
 
   const llamarNumero = useCallback(() => {
     const numero = numeros[Math.floor(Math.random() * numeros.length)];
-    setNumerosLlamados((prev) => [...prev, numero]);
-    setNumeroActual(numero);
+    agregarNumero(numero);
+    actualizarNumeroActual(numero);
     setNumeros(numeros.filter((n) => n !== numero));
-  }, [numeros, setNumerosLlamados, setNumeroActual]);
+  }, [numeros, agregarNumero, actualizarNumeroActual]);
 
   useEffect(() => {
     if (!estaPausado && !juegoTerminado && juegoActivo) {
@@ -50,13 +52,19 @@ const Bingo = () => {
     }
   }, [estaPausado, numeros, juegoTerminado, juegoActivo, llamarNumero]);
 
+  const handleReiniciarJuego = () => {
+    reiniciarJuego();
+    setNumeros(Array.from({ length: 99 }, (_, i) => i + 1));
+    generarCarton();
+  };
+
   useEffect(() => {
     if (cartonGenerado && carton.every((numero) => numerosLlamados.includes(numero))) {
-      setJuegoTerminado(true);
-      setMostrarBingo(true);
+      terminarJuego();
+      mostrarBingo();
       pausarJuego();
     }
-  }, [numerosLlamados, carton, cartonGenerado, setJuegoTerminado, setMostrarBingo, pausarJuego]);
+  }, [numerosLlamados, carton, cartonGenerado, terminarJuego, mostrarBingo, pausarJuego]);
 
   const numerosCarton = useMemo(() => (
     carton.map((numero, index) => (
@@ -84,7 +92,7 @@ const Bingo = () => {
       <button className="boton-iniciar" onClick={iniciarJuego} disabled={juegoActivo}>
         Iniciar Bingo
       </button>
-      <button className="boton-reiniciar" onClick={reiniciarJuego} disabled={!juegoActivo}>
+      <button className="boton-reiniciar" onClick={handleReiniciarJuego} disabled={!juegoActivo}>
         Reiniciar Bingo
       </button>
       {estaPausado ? (
@@ -96,6 +104,7 @@ const Bingo = () => {
           Pausar Juego
         </button>
       )}
+
       <div className="bingo-tablero-container">
         <div className="bingo-tablero">
           <div className="numeros">
@@ -107,10 +116,10 @@ const Bingo = () => {
           </div>
         </div>
         <div className="numero-llamado">
-          {!mostrarBingo && numeroActual && <div className="bola">{numeroActual}</div>}
+        {numeroActual && <div className="bola">{numeroActual}</div>}
         </div>
       </div>
-      {mostrarBingo && <div className="mensaje-bingo">¡Bingo!</div>}
+      {juegoTerminado && mostrarBingo && <div className="mensaje-bingo">¡Bingo!</div>}
     </div>
   );
 };

@@ -4,8 +4,6 @@ import './TresEnRaya.css';
 
 const TresEnRaya = () => {
   const {
-    juegoActivo,
-    iniciarJuego,
     reiniciarJuego,
   } = useJuego('tres-en-raya');
 
@@ -13,6 +11,7 @@ const TresEnRaya = () => {
   const [jugadorActual, setJugadorActual] = React.useState('X');
   const [ganador, setGanador] = React.useState(null);
   const [esperandoIA, setEsperandoIA] = React.useState(false);
+  const [turnoIATimeout, setTurnoIATimeout] = React.useState(null);
 
   const verificarGanador = useCallback((nuevoTablero) => {
     const combinacionesGanadoras = [
@@ -33,28 +32,27 @@ const TresEnRaya = () => {
         return;
       }
     }
-    
+
     if (!nuevoTablero.includes(null)) {
       setGanador('Empate');
     }
   }, []);
 
   const realizarMovimientoIA = useCallback(() => {
-    setTimeout(() => {
-      const espaciosDisponibles = tablero.map((valor, index) => valor === null ? index : null).filter(v => v !== null);
-      if (espaciosDisponibles.length === 0) return;
+    const espaciosDisponibles = tablero.map((valor, index) => valor === null ? index : null).filter(v => v !== null);
+    if (espaciosDisponibles.length === 0 || ganador) return;
 
-      const movimientoIA = espaciosDisponibles[Math.floor(Math.random() * espaciosDisponibles.length)];
-      const nuevoTablero = [...tablero];
-      nuevoTablero[movimientoIA] = 'O';
-      setTablero(nuevoTablero);
-      verificarGanador(nuevoTablero);
-      setJugadorActual('X');
-    }, 1000);
-  }, [tablero, verificarGanador]);
+    const movimientoIA = espaciosDisponibles[Math.floor(Math.random() * espaciosDisponibles.length)];
+    const nuevoTablero = [...tablero];
+    nuevoTablero[movimientoIA] = 'O';
+    setTablero(nuevoTablero);
+    verificarGanador(nuevoTablero);
+    setJugadorActual('X');
+    setEsperandoIA(false);
+  }, [tablero, verificarGanador, ganador]);
 
   const manejarClick = useCallback((index) => {
-    if (tablero[index] || ganador) return;
+    if (tablero[index] || ganador || esperandoIA) return;
 
     const nuevoTablero = [...tablero];
     nuevoTablero[index] = jugadorActual;
@@ -62,36 +60,48 @@ const TresEnRaya = () => {
     verificarGanador(nuevoTablero);
     setJugadorActual('O');
     setEsperandoIA(true);
-  }, [tablero, jugadorActual, ganador, verificarGanador]);
+  }, [tablero, jugadorActual, ganador, verificarGanador, esperandoIA]);
 
   useEffect(() => {
-    if (esperandoIA) {
-      realizarMovimientoIA();
-      setEsperandoIA(false);
+    if (esperandoIA && !ganador) {
+      const timeout = setTimeout(realizarMovimientoIA, 1000);
+      setTurnoIATimeout(timeout);
+
+      return () => clearTimeout(timeout);
     }
-  }, [esperandoIA, realizarMovimientoIA]);
+  }, [esperandoIA, realizarMovimientoIA, ganador]);
 
   const casillas = useMemo(() => (
     tablero.map((valor, index) => (
-      <div key={index} className="casilla" onClick={() => manejarClick(index)}>
+      <div key={index} className={`casilla ${esperandoIA || ganador ? 'deshabilitado' : ''}`} onClick={() => manejarClick(index)}>
         {valor}
       </div>
     ))
-  ), [tablero, manejarClick]);
+  ), [tablero, manejarClick, esperandoIA, ganador]);
+
+  const reiniciarPartida = () => {
+    setTablero(Array(9).fill(null));
+    setJugadorActual('X');
+    setGanador(null);
+    setEsperandoIA(false);
+    clearTimeout(turnoIATimeout);
+    reiniciarJuego();
+  };
 
   return (
     <div className="tres-en-raya-container">
       <h1>Tres en Raya</h1>
-      <button className="boton-iniciar" onClick={iniciarJuego} disabled={juegoActivo}>
-        Iniciar Juego
-      </button>
-      <button className="boton-reiniciar" onClick={reiniciarJuego} disabled={!juegoActivo}>
-        Reiniciar Juego
-      </button>
       <div className="tablero">
         {casillas}
       </div>
-      {ganador && <div className="mensaje">{ganador === 'Empate' ? '¡Es un empate!' : `¡Ganó ${ganador}!`}</div>}
+      <div className="estado">
+        {ganador ? (ganador === 'Empate' ? '¡Es un empate!' : `¡Ganó ${ganador}!`) : `Turno de ${jugadorActual}`}
+      </div>
+      <div className="contenedor-reiniciar">
+        <button className="boton-reiniciar" onClick={reiniciarPartida}>
+          Reiniciar Juego
+        </button>
+      </div>
     </div>
   );
 };

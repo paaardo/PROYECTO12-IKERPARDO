@@ -8,6 +8,7 @@ h1 {
   grid-template-columns: repeat(3, 80px);
   grid-gap: 10px;
   margin-bottom: 20px;
+  justify-content: center;
 }
 
 .casilla {

@@ -1,4 +1,3 @@
-// src/hooks/useJuego.js
 import { useReducer } from 'react';
 
 const estadoInicial = {
@@ -45,6 +44,11 @@ const juegoReducer = (estado, accion) => {
       return {
         ...estado,
         numerosLlamados: [...estado.numerosLlamados, accion.payload],
+      };
+    case 'ACTUALIZAR_NUMERO_ACTUAL':
+      return {
+        ...estado,
+        numeroActual: accion.payload,
       };
     case 'TERMINAR_JUEGO':
       return {
@@ -95,6 +99,10 @@ const useJuego = (juego) => {
     despachar({ type: 'AGREGAR_NUMERO', payload: numero });
   };
 
+  const actualizarNumeroActual = (numero) => {
+    despachar({ type: 'ACTUALIZAR_NUMERO_ACTUAL', payload: numero });
+  };
+
   const terminarJuego = () => {
     despachar({ type: 'TERMINAR_JUEGO' });
   };
@@ -111,6 +119,7 @@ const useJuego = (juego) => {
     reiniciarJuego,
     generarCarton,
     agregarNumero,
+    actualizarNumeroActual,
     terminarJuego,
     mostrarBingo,
   };
