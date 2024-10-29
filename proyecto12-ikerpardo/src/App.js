@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
-import Bingo from './components/Bingo';
-import TresEnRaya from './components/TresEnRaya';
+import Bingo from './components/Bingo/Bingo';
+import TresEnRaya from './components/TresEnRaya/TresEnRaya';
 import './App.css';
 
 const App = () => {

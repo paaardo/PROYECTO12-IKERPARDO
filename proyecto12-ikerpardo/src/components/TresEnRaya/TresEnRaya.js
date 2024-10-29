@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback, useMemo } from 'react';
-import useJuego from '../hooks/useJuego';
+import useJuego from '../../hooks/useJuego';
 import './TresEnRaya.css';
 
 const TresEnRaya = () => {
@@ -89,20 +89,20 @@ const TresEnRaya = () => {
   };
 
   return (
-    <div className="tres-en-raya-container">
-      <h1>Tres en Raya</h1>
-      <div className="tablero">
+    <section className="tres-en-raya-container">
+      <header>
+        <h1>Tres en Raya</h1>
+      </header>
+      <article className="tablero">
         {casillas}
-      </div>
-      <div className="estado">
+      </article>
+      <article className="estado">
         {ganador ? (ganador === 'Empate' ? '¡Es un empate!' : `¡Ganó ${ganador}!`) : `Turno de ${jugadorActual}`}
-      </div>
-      <div className="contenedor-reiniciar">
-        <button className="boton-reiniciar" onClick={reiniciarPartida}>
-          Reiniciar Juego
-        </button>
-      </div>
-    </div>
+      </article>
+      <button className="boton-reiniciar" onClick={reiniciarPartida}>
+        Reiniciar Juego
+      </button>
+    </section>
   );
 };
 
